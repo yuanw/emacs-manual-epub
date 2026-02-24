@@ -80,6 +80,9 @@
                 set -euo pipefail
 
                 OUTPUT="''${1:-$HOME/emacs-manual.epub}"
+                # Convert to absolute path before changing directories
+                OUTPUT=$(realpath -m "$OUTPUT")
+                mkdir -p "$(dirname "$OUTPUT")"
                 echo "📚 Converting local Emacs manual to EPUB..."
 
                 # Use the Emacs source derivation directly (much faster than find!)
@@ -123,6 +126,9 @@
                 set -euo pipefail
 
                 OUTPUT="''${1:-$HOME/elisp-manual.epub}"
+                # Convert to absolute path before changing directories
+                OUTPUT=$(realpath -m "$OUTPUT")
+                mkdir -p "$(dirname "$OUTPUT")"
                 echo "📚 Converting local Elisp manual to EPUB..."
 
                 # Use the Emacs source derivation directly (much faster than find!)
