@@ -4,8 +4,9 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+    
     git-hooks.url = "github:cachix/git-hooks.nix";
-    git-hooks.flake = false;
+    git-hooks.inputs.nixpkgs.follows = "nixpkgs";
     emacs = {
       url = "github:nix-community/emacs-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -18,9 +19,9 @@
       "x86_64-linux"
     ];
     imports = [
-    (inputs.git-hooks + /flake-module.nix)      
+     inputs.git-hooks.flakeModule     
     ];
-    perSystem = { pkgs, system, ... }: {
+    perSystem = { config, pkgs, system, ... }: {
   _module.args.pkgs = import inputs.nixpkgs {
     inherit system;
     overlays = [
@@ -31,11 +32,14 @@
     ];
     config = { };
   };
-  pre-commit.settings = {
+  pre-commit.settings.hooks = {
         nixpkgs-fmt.enable = true;    
   };
 
   devShells.default = pkgs.mkShell {
+    shellHook = ''
+      ${config.pre-commit.shellHook}
+      '';
   };
 };
 
