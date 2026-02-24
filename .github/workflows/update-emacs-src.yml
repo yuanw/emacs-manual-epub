@@ -1,14 +1,12 @@
-name: Build
+name: Update Emacs Source
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  schedule:
+    - cron: "0 0 * * 0" # Weekly on Sunday at midnight
   workflow_dispatch:
 
 jobs:
-  build:
+  update-emacs-src:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -16,8 +14,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          submodules: recursive
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
@@ -27,24 +23,18 @@ jobs:
           name: yuanwang-wf
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
 
-      - name: Create epubs directory
-        run: mkdir -p epubs
-
-      - name: Generate Emacs manual EPUB
-        run: nix develop --command emacs-manual-to-epub epubs/emacs-manual.epub
-
-      - name: Generate Elisp manual EPUB
-        run: nix develop --command elisp-manual-to-epub epubs/elisp-manual.epub
+      - name: Update emacs-src
+        run: nix develop --command update-emacs-src
 
       - name: Commit and push if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add epubs/
+          git add emacs-src.json
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Update EPUB manuals"
+            git commit -m "Update emacs-src to latest"
             git pull --rebase --autostash
             git push
           fi
