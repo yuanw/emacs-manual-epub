@@ -111,6 +111,12 @@
                 cp -r "$SOURCE_DIR"/* "$TMPDIR/"
                 cd "$TMPDIR"
 
+                # Provide htmlxref.cnf entries for external manuals referenced by emacs.texi
+                cat > "$TMPDIR/htmlxref.cnf" <<EOF
+                eintr node https://www.gnu.org/software/emacs/manual/html_node/eintr/
+                eintr mono https://www.gnu.org/software/emacs/manual/eintr/eintr.html
+                EOF
+
                 echo "🔄 Converting to EPUB..."
                 # Convert to EPUB with Archive::Zip available
                 export PERL5LIB="${pkgs.perlPackages.ArchiveZip}/lib/perl5/site_perl"
