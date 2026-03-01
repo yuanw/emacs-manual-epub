@@ -11,6 +11,7 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
         "x86_64-linux"
+        "aarch64-darwin"
       ];
       imports = [
         inputs.git-hooks-nix.flakeModule
@@ -60,8 +61,7 @@
                 PREFETCH_OUTPUT=$(${pkgs.nix-prefetch-git}/bin/nix-prefetch-git \
                   --url https://git.savannah.gnu.org/git/emacs.git \
                   --rev "$NEW_REV" \
-                  --sparse-checkout doc \
-                  --sparse-checkout configure.ac \
+                  --sparse-checkout "$(printf 'doc\nconfigure.ac')" \
                   2>/dev/null)
 
                 NEW_HASH=$(echo "$PREFETCH_OUTPUT" | ${pkgs.jq}/bin/jq -r '.hash')
