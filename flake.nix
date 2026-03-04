@@ -25,8 +25,8 @@
             sparseCheckout = [ "doc" "configure.ac" ];
           };
           emacs-cover = pkgs.fetchurl {
-            url = "https://www.gnu.org/software/emacs/images/emacs.png";
-            hash = "sha256-9s7axiRrk/8zZ3HvvMlxcr0ShORIA5t9Ld84/sp6QJE=";
+            url = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/GNU_Emacs_manual_cover_design.png/500px-GNU_Emacs_manual_cover_design.png";
+            hash = "sha256-ZZC+CiWCZrA/Ayzl37XJNGNttmVQb7SMmfqggqqZ+bM=";
           };
           elisp-cover = pkgs.fetchurl {
             url = "https://www.gnu.org/graphics/use-gnu.png";
