@@ -28,10 +28,7 @@
             url = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/GNU_Emacs_manual_cover_design.png/500px-GNU_Emacs_manual_cover_design.png";
             hash = "sha256-ZZC+CiWCZrA/Ayzl37XJNGNttmVQb7SMmfqggqqZ+bM=";
           };
-          elisp-cover = pkgs.fetchurl {
-            url = "https://www.gnu.org/graphics/use-gnu.png";
-            hash = "sha256-f8RM2D4xODOiznCNxXW1vEvW7HEZHx7b45RvupBaI1M=";
-          };
+
           add-epub-cover = pkgs.writeText "add-epub-cover.py" ''
             import zipfile, sys, os, re
             epub_path, cover_path, out_path = sys.argv[1:4]
@@ -213,9 +210,6 @@
                   --output="$OUTPUT" \
                   elisp.texi
 
-                echo "📖 Adding cover image..."
-                ${pkgs.python3}/bin/python3 ${add-epub-cover} "$OUTPUT" "${elisp-cover}" "$OUTPUT.tmp"
-                mv "$OUTPUT.tmp" "$OUTPUT"
 
                 echo "✅ Elisp manual saved to: $OUTPUT"
                 ls -lh "$OUTPUT"
