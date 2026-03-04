@@ -24,6 +24,42 @@
             inherit (emacs-src-info) rev hash;
             sparseCheckout = [ "doc" "configure.ac" ];
           };
+          emacs-cover = pkgs.fetchurl {
+            url = "https://www.gnu.org/software/emacs/images/emacs.png";
+            hash = "sha256-9s7axiRrk/8zZ3HvvMlxcr0ShORIA5t9Ld84/sp6QJE=";
+          };
+          elisp-cover = pkgs.fetchurl {
+            url = "https://www.gnu.org/graphics/use-gnu.png";
+            hash = "sha256-f8RM2D4xODOiznCNxXW1vEvW7HEZHx7b45RvupBaI1M=";
+          };
+          add-epub-cover = pkgs.writeText "add-epub-cover.py" ''
+            import zipfile, sys, os, re
+            epub_path, cover_path, out_path = sys.argv[1:4]
+            cover_ext = os.path.splitext(cover_path)[1].lower()
+            cover_name = 'cover' + cover_ext
+            media_type = {'png': 'image/png', 'jpg': 'image/jpeg'}.get(cover_ext[1:], 'image/png')
+            with zipfile.ZipFile(epub_path, 'r') as zin:
+                names = zin.namelist()
+                contents = {n: zin.read(n) for n in names}
+            container = contents['META-INF/container.xml'].decode()
+            opf_path = re.search('full-path="([^"]+\\.opf)"', container).group(1)
+            opf_dir = os.path.dirname(opf_path)
+            opf = contents[opf_path].decode()
+            item = '<item id="cover-image" properties="cover-image" media-type="' + media_type + '" href="' + cover_name + '"/>'
+            opf = re.sub(r'(<manifest[^>]*>)', r'\1\n      ' + item, opf)
+            opf = re.sub(r'(</metadata>)', '      <meta name="cover" content="cover-image"/>\n   ' + r'\1', opf)
+            cover_epub_path = (opf_dir + "/" if opf_dir else "") + cover_name
+            with open(cover_path, 'rb') as f:
+                cover_data = f.read()
+            with zipfile.ZipFile(out_path, 'w') as zout:
+                zout.writestr('mimetype', contents['mimetype'], compress_type=zipfile.ZIP_STORED)
+                for name in names:
+                    if name == 'mimetype':
+                        continue
+                    data = opf.encode() if name == opf_path else contents[name]
+                    zout.writestr(name, data, compress_type=zipfile.ZIP_DEFLATED)
+                zout.writestr(cover_epub_path, cover_data, compress_type=zipfile.ZIP_DEFLATED)
+          '';
         in
         {
           pre-commit.settings.hooks = {
@@ -124,6 +160,10 @@
                   --output="$OUTPUT" \
                   emacs.texi
 
+                echo "📖 Adding cover image..."
+                ${pkgs.python3}/bin/python3 ${add-epub-cover} "$OUTPUT" "${emacs-cover}" "$OUTPUT.tmp"
+                mv "$OUTPUT.tmp" "$OUTPUT"
+
                 echo "✅ Emacs manual saved to: $OUTPUT"
                 ls -lh "$OUTPUT"
               '')
@@ -172,6 +212,10 @@
                 ${pkgs.texinfoInteractive}/bin/makeinfo --epub \
                   --output="$OUTPUT" \
                   elisp.texi
+
+                echo "📖 Adding cover image..."
+                ${pkgs.python3}/bin/python3 ${add-epub-cover} "$OUTPUT" "${elisp-cover}" "$OUTPUT.tmp"
+                mv "$OUTPUT.tmp" "$OUTPUT"
 
                 echo "✅ Elisp manual saved to: $OUTPUT"
                 ls -lh "$OUTPUT"
