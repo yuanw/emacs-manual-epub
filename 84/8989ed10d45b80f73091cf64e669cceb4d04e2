@@ -1,0 +1,23 @@
+.github/workflows/update-flake.yml
+  c567706479496155 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.9",
+  "base_commit_sha": "848989ed10d45b80f73091cf64e669cceb4d04e2",
+  "prompts": {
+    "c567706479496155": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b96ca5c8-c76b-4cc0-8ed1-d92ec8793dee",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "yuanw <me@yuanwang.ca>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
